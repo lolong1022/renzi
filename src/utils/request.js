@@ -3,7 +3,7 @@ import axios from 'axios'
 
 // 通过axios创建axios 实例
 const service = axios.create({
-  url: '/dev',
+  url: 'process.env.VUE_APP_BASE_API',
   timeout: 5000
 })
 export default service
