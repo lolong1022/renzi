@@ -2,7 +2,7 @@ import router from '@/router'
 import store from '@/store'
 // 白名单
 const whiteList = ['/login', '/404']
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   // 1,判断token是否存在
   // 1.1存在处于登录状态
   // 是否去往登录页处于则去首页否则放行
@@ -12,6 +12,9 @@ router.beforeEach((to, from, next) => {
   console.log(from)
 
   if (store.getters.token) { // 已登陆的状态
+    if (!store.getters.userId) {
+      await store.dispatch('user/getUserInfo')
+    }
     if (to.path === '/login') {
       next('/')
     } else {

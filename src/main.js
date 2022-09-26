@@ -8,14 +8,18 @@ import 'element-ui/lib/theme-chalk/index.css'
 // lang i18n
 
 import '@/styles/index.scss' // global css
-
 import App from './App'
 import store from './store'
 import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
-
+// 自定义指令全部导入
+import * as directive from '@/directive'
+// 循环加入全局
+for (const k in directive) {
+  Vue.directive(k, directive[k])
+}
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

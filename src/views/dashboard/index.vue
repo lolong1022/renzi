@@ -6,6 +6,7 @@
 </template>
 
 <script>
+// import { resolve } from 'path'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -15,6 +16,10 @@ export default {
       'name'
     ])
   }
+  // async created() {
+  //   await this.$store.dispatch('user/getUserInfo')
+  //   // res.username = '11111'
+  // }
 }
 </script>
 

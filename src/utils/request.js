@@ -1,11 +1,24 @@
 // 实现对axios的封住
 import axios from 'axios'
 import { Message } from 'element-ui'
+import store from '@/store'
 // 通过axios创建axios 实例
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API,
   timeout: 5000
 })
+service.interceptors.request.use(
+  config => {
+    if (store.getters.token) {
+      console.log(123, store.getters.token)
+      config.headers.Authorization = `Bearer ${store.getters.token}`
+    }
+    return config
+  },
+  error => {
+    return Promise.reject(error)
+  }
+)
 // 请求拦截器
 service.interceptors.response.use(
   // 请求返回成功
