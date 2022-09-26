@@ -50,6 +50,7 @@ import { validPhone } from '@/utils/validate'
 export default {
   name: 'Login',
   data() {
+    // 定义自定义校验规则
     const phoneValid = (rule, value, callback) => {
       if (validPhone(value)) {
         callback()
@@ -58,12 +59,15 @@ export default {
       }
     }
     return {
+      // 密码框type属性
       isShowPassword: 'password',
+      // 表单数据对象
       loginForm: {
         mobile: '13800000002',
         password: '123456'
       },
       loading: false,
+      // 表单验证规则
       rules: {
         mobile: [
           { required: true, message: '手机号必填', trigger: 'blur' },
@@ -81,12 +85,15 @@ export default {
     }
   },
   methods: {
+    // 动态改变密码的框
     changPwd() {
       this.isShowPassword === 'password' ? this.isShowPassword = '' : this.isShowPassword = 'password'
+      // 点击icon图标  数据更新之后调用  focus事件
       this.$nextTick(() => {
         this.$refs.pwd.focus()
       })
     },
+    // 点击登陆按钮并调用vuex中loginAction方法
     async login() {
       // await loginAPI({ mobile: '13800000002',
       //   password: '123456' })
@@ -94,6 +101,8 @@ export default {
         await this.$refs.loginForm.validate()
         this.loading = true
         await this.$store.dispatch('user/loginAction', this.loginForm)
+        // 路由跳转到首页
+        this.$router.push('/')
       } finally {
         this.loading = false
       }

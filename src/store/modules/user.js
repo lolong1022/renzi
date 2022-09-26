@@ -11,7 +11,7 @@ export default {
   },
   actions: {
     async loginAction({ commit }, loginData) {
-      const { data: { data }} = await loginAPI(loginData)
+      const data = await loginAPI(loginData)
       commit('SET_TOKEN', data)
     }
   }
