@@ -30,7 +30,7 @@
               width="240"
             >
               <template slot-scope="{ row }">
-                <el-button size="small" type="success">分配权限asdf</el-button>
+                <el-button size="small" type="success">分配权限asdfads</el-button>
                 <el-button size="small" type="primary" @click="editRole(row)">编辑</el-button>
                 <el-button size="small" type="danger" @click="delRoles(row.id)">删除</el-button>
               </template>
