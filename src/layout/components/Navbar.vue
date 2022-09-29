@@ -3,7 +3,7 @@
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
 
     <!-- <breadcrumb class="breadcrumb-container" /> -->
-    <div class="app-breadcrumb">
+    <div class="app-breadcrumb" style="padding-right:0">
       江苏传智播客教育科技股份有限公司
       <span class="breadBtn">体验版</span>
     </div>
@@ -91,6 +91,7 @@ export default {
     margin-left: 15px;
   }
 }
+
 .avatar-container {
       margin-right: 30px;
       .avatar-wrapper {

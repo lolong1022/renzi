@@ -6,7 +6,6 @@
 </template>
 
 <script>
-// import { resolve } from 'path'
 import { mapGetters } from 'vuex'
 
 export default {
