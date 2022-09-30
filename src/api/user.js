@@ -1,20 +1,18 @@
 import request from '@/utils/request'
 
-export function login(data) {
-
-}
-// 用户资料
-export const getInfo = () => {
+/**
+ * 获取用户基本资料
+ * @returns
+ */
+export function getUserInfoAPI() {
   return request({
     url: '/sys/profile',
     method: 'POST'
   })
 }
-// 获取员工基本信息
-export const getUserInfo = (id) => {
+
+export function getUserBasicInfoAPI(id) {
   return request({
     url: `/sys/user/${id}`
   })
-}
-export function logout() {
 }
