@@ -97,7 +97,7 @@ export default {
       this.dialogVisible = true
     },
     editRole(row) {
-      // console.log(row)
+      console.log(324324, row)
       // 给编辑绑定点击事件
       // 用template把按钮包起来
       //  slot-scope="{row}"把row解构出来，row代表本行数据
