@@ -1,35 +1,30 @@
 <template>
   <div class="login-container">
-    <el-form
-      ref="loginForm"
-      class="login-form"
-      auto-complete="on"
-      label-position="left"
-      :model="loginForm"
-      :rules="rules"
-    >
+    <el-form ref="loginForm" class="login-form" auto-complete="on" label-position="left" :model="loginForm" :rules="rules">
+
       <div class="title-container">
         <h3 class="title">
           <img src="@/assets/common/login-logo.png" alt="">
         </h3>
-        <el-form-item prop="mobile">
-          <span class="svg-container el-icon-user-solid" />
-          <el-input v-model="loginForm.mobile" />
-        </el-form-item>
-        <el-form-item v-model="loginForm.passwors" prop="password">
-          <!-- <span class="svg-container el-icon-user-solid" /> -->
-          <span class="svg-container">
-            <svg-icon icon-class="password" />
-          </span>
-          <el-input ref="pwd" v-model="loginForm.password" :type="isShowPassword" />
-          <span class="svg-container" @click="changPwd">
-            <svg-icon :icon-class="isShowPassword==='password'?'eye':'eye-open'" />
-          </span>
-        <!-- <span class="svg-container el-icon-user-solid" /> -->
-        </el-form-item>
       </div>
 
-      <el-button class="loginBtn" :loading="loading" @click="login">登录</el-button>
+      <el-form-item prop="mobile">
+        <span class="svg-container el-icon-user-solid" />
+        <el-input v-model="loginForm.mobile" />
+      </el-form-item>
+      <!-- prop绑定校验规则 -->
+      <el-form-item prop="password">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input ref="pwd" v-model="loginForm.password" :type="passwordType" />
+        <span class="svg-container" @click="showPwd">
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+
+      <el-button class="loginBtn" style="width:100%;margin-bottom:30px;border:none;color:white;" :loading="loading" @click="login">Login</el-button>
+
       <div class="tips">
         <span style="margin-right:20px;">账号: 13800000002</span>
         <span> 密码: 123456</span>
@@ -37,71 +32,58 @@
 
     </el-form>
   </div>
-  <!-- 环境变量的作用
-  1. 正常公司中 有几个环境 4 开发 dev 测试 test 预发 uat 线上 pro
-  2. 在项目里如何配置这几个环境  通过 .env 配置 base api
-  开发环境的接口前缀 /api
-  线上环境的接口前缀 /prod-api
-   -->
+
 </template>
+
 <script>
-// import { loginAPI } from '@/api/login'
-import { validPhone } from '@/utils/validate'
+// El-form-item绑定对应的属性，El-input 绑定对应的值
+// 手机号 必填 格式 按照国家要求来
+// 密码 必填 程度6，16
+import { validphone } from '@/utils/validate'
 export default {
   name: 'Login',
   data() {
-    // 定义自定义校验规则
-    const phoneValid = (rule, value, callback) => {
-      if (validPhone(value)) {
-        callback()
+    const phonevalid = (rule, value, callback) => {
+      if (!validphone(value)) {
+        callback(new Error('格式错误'))
       } else {
-        callback(new Error('语法格式错误'))
+        callback()
       }
     }
     return {
-      // 密码框type属性
-      isShowPassword: 'password',
-      // 表单数据对象
+      loading: false,
+      passwordType: 'password',
       loginForm: {
         mobile: '13800000002',
         password: '123456'
       },
-      loading: false,
-      // 表单验证规则
       rules: {
         mobile: [
-          { required: true, message: '手机号必填', trigger: 'blur' },
-          {
-            validator: phoneValid,
-            trigger: 'blur'
-          }
+          { required: true, message: '必填', trigger: 'blur' },
+          { validator: phonevalid, trigger: 'blur' }
+          // { pattern: /^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[189]))\d{8}$/,
+          //   message: '格式错误', trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '手机号必填', trigger: 'blur' },
-          { min: 6, max: 16, message: '密码格式不对', trigger: 'blur' }
+          { required: true, message: '必填', trigger: 'blur' },
+          { min: 6, max: 16, message: '格式错误', trigger: 'blur' }
         ]
-
       }
     }
   },
+
   methods: {
-    // 动态改变密码的框
-    changPwd() {
-      this.isShowPassword === 'password' ? this.isShowPassword = '' : this.isShowPassword = 'password'
-      // 点击icon图标  数据更新之后调用  focus事件
+    showPwd() {
+      this.passwordType === 'password' ? this.passwordType = '' : this.passwordType = 'password'
       this.$nextTick(() => {
         this.$refs.pwd.focus()
       })
     },
-    // 点击登陆按钮并调用vuex中loginAction方法
     async login() {
-      // await loginAPI({ mobile: '13800000002',
-      //   password: '123456' })
       try {
         await this.$refs.loginForm.validate()
         this.loading = true
         await this.$store.dispatch('user/loginAction', this.loginForm)
-        // 路由跳转到首页
         this.$router.push('/')
       } finally {
         this.loading = false
@@ -117,7 +99,7 @@ export default {
 
 $bg:#d2e5ff;
 $light_gray:#68b0fe;
-$cursor: #68b0fe;
+$cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
   .login-container .el-input input {
@@ -146,32 +128,26 @@ $cursor: #68b0fe;
 
       &:-webkit-autofill {
         box-shadow: 0 0 0px 1000px $bg inset !important;
-        -webkit-text-fill-color: $cursor !important;
+        -webkit-text-fill-color: $light_gray !important;
       }
     }
   }
 
   .el-form-item {
     border: 1px solid rgba(255, 255, 255, 0.1);
-    // background: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.7); // 输入登录表单的背景色
     border-radius: 5px;
     color: #454545;
-    background: rgba(255, 255, 255, 0.7); // 输入登录表单的背景色
   }
   .el-form-item__error {
     color: #fff
   }
   .loginBtn {
-    border:0;
-    color:#fff;
-    background: #407ffe;
-    width: 100%;
-    margin-bottom: 30px;
-    height: 64px;
-    line-height: 32px;
-    font-size: 24px;
-  }
-
+  background: #407ffe;
+  height: 64px;
+  line-height: 32px;
+  font-size: 24px;
+}
 }
 </style>
 

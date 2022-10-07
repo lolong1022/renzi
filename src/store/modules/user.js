@@ -1,53 +1,45 @@
-import { loginAPI } from '@/api/login'
-import { getInfo, getUserInfo } from '@/api/user'
+import { loginAPI, getUserInfoAPI, getUserBasicInfoAPI } from '@/api'
 export default {
   namespaced: true,
   state: {
     token: null,
     userInfo: {},
-    haraas: 0
+    initTime: 0
   },
   mutations: {
     SET_TOKEN(state, token) {
       state.token = token
     },
-    SET_USERINFO(state, userInfo) {
+    SET_USER_INFO(state, userInfo) {
       state.userInfo = userInfo
     },
-    // 删除用户信息
-    DEL_USERINFO(state, userInfo) {
+    REMOVE_USER_INFO(state) {
       state.userInfo = {}
     },
-    // 删除token
-    DLE_TOKEN(state) {
+    REMOVE_TOKEN(state) {
       state.token = null
     },
-    SET_HARAAS_TIME(state, getTokentime) {
-      state.haraas = getTokentime
+    GET_INIT_TIME(state, initTime) {
+      state.initTime = initTime
     }
   },
   actions: {
-    // 拿到token
     async loginAction({ commit }, loginData) {
       const data = await loginAPI(loginData)
       commit('SET_TOKEN', data)
-      // 获得token时间
-      commit('SET_HARAAS_TIME', +new Date())
+      commit('GET_INIT_TIME', new Date().getTime())
     },
-    async getUserInfo({ commit }) {
-      console.log(getInfo)
-      // 请求
-      const data = await getInfo()
-      const data1 = await getUserInfo(data.userId)
-      const userInfo = { ...data, ...data1 }
-      commit('SET_USERINFO', userInfo)
-      // return data
-      return JSON.parse(JSON.stringify(userInfo))
+    async userInfoAction({ commit }) {
+      const res = await getUserInfoAPI()
+      // console.log(res)
+      const res1 = await getUserBasicInfoAPI(res.userId)
+      const result = { ...res, ...res1 }
+      commit('SET_USER_INFO', result)
+      return JSON.parse(JSON.stringify(result))
     },
-    // 退出登录清除用户和token
-    logout({ commit }) {
-      commit('DEL_USERINFO')
-      commit('DLE_TOKEN')
+    logoutAction({ commit }) {
+      commit('REMOVE_USER_INFO')
+      commit('REMOVE_TOKEN')
     }
   }
 }

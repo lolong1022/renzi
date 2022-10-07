@@ -1,10 +1,16 @@
 import request from '@/utils/request'
-export const getRoleListAPI = (params) => {
+
+/**
+ * 获取所有角色列表
+ * @returns
+ */
+export function getRoleListAPI(params) {
   return request({
     url: '/sys/role',
     params
   })
 }
+
 /** *
  * 新增角色
  * ***/
@@ -19,23 +25,30 @@ export function addRoleAPI(data) {
 /**
  * 修改角色
  * ***/
-export function updateRole(data) {
+export function updateRoleAPI(data) {
   return request({
     url: `/sys/role/${data.id}`,
     data,
     method: 'put'
   })
 }
-// 删除人员列表
-export function deleteRole(id) {
+
+/** **
+ *  删除角色
+ *
+ * ****/
+export function deleteRoleAPI(id) {
   return request({
     url: `/sys/role/${id}`,
     method: 'delete'
   })
 }
-// 公司信息
-export const componyInfo = (componyId) => {
+
+/**
+ * 获取公司信息
+ * **/
+export function getCompanyInfoAPI(companyId) {
   return request({
-    url: `/company/${componyId}`
+    url: `/company/${companyId}`
   })
 }

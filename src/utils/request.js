@@ -1,70 +1,63 @@
-// 实现对axios的封住
+// 实现对axios封装
 import axios from 'axios'
 import { Message } from 'element-ui'
 import store from '@/store'
 import router from '@/router'
-// token存在时间   会过期
-const TIMEOUT = 3600 * 1000
-// 通过axios创建axios 实例
+// 对比时间是否超时
+// 拿到每次刷新的时间--->请求拦截器每次都可以拿到
+const timeOut = 86400 // 秒
+function IsCheckTimeOut() {
+  const refreshTime = Date.now() // 每次刷新的时间戳
+  const timeDifference = (refreshTime - store.getters.initTime) / 1000 // 时间差
+  return timeDifference > timeOut // true超时 /false 未超时
+}
+
+// 通过axios创建axios实例
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API,
+  baseURL: process.env.VUE_APP_BASE_API, // 基准地址
   timeout: 5000
 })
-// 封装一个判断token值是否过期的函数
-function getOutTimeToken() {
-  const newTime = +new Date()
-  const outTime = newTime - store.getters.haraas
-  return outTime > TIMEOUT
-}
-service.interceptors.request.use(
-  config => {
-    if (store.getters.token) {
-      // 每次发请求判断token时间是否过期
-      if (getOutTimeToken()) {
-        // 调用清除数据函数 logout
-        store.dispatch('user/logout')
-        // 跳转login页面
-        router.push('/login')
-        // 抛出错误
-        return Promise.reject(new Error('token过期'))
-      }
-      // 请求头  添加 Authorization
-      config.headers.Authorization = `Bearer ${store.getters.token}`
-    }
-    return config
-  },
-  error => {
-    return Promise.reject(error)
-  }
-)
-// 响应拦截器
-service.interceptors.response.use(
-  // 请求返回成功
-  (response) => {
-    // 吧data, success, message 从axios返回数据中结构出来
-    const { data, success, message } = response.data
-    // 判断业务逻辑返回的是否成功
-    // 没成功就抛出错
-    if (success) {
-      return data
-    } else {
-      Message.error(message)
-      return Promise.reject(new Error(message))
-    }
-  },
-  // 请求失败
-  (error) => {
-    console.log(error.response)
-    if (error.response?.status === 401) {
-      // 调用清除数据函数 logout
-      store.dispatch('user/logout')
-      // 跳转login页面
+
+// 请求拦截器
+// 每次在接口中携带token很麻烦，所以我们可以在axios拦截器中统一注入token
+service.interceptors.request.use(config => {
+  // 在这个位置需要统一的去注入token
+  if (store.getters.token) {
+    // 如果token存在 注入token
+    if (IsCheckTimeOut()) { // 超时
+      store.dispatch('user/logoutAction') // 个人信息和token清空
       router.push('/login')
-      Message.error('token 过期')
-    } else {
-      Message.error(error.message)
+      return Promise.reject(new Error('token 超时，请重新登录'))
     }
-    return Promise.reject(error)
+    config.headers.Authorization = `Bearer ${store.getters.token}`
   }
-)
+  return config // 必须返回配置
+}, error => {
+  return Promise.reject(error)
+})
+
+// 响应拦截器
+service.interceptors.response.use(response => {
+  // 考虑把那些数据抛出去
+  // 接口成功并且业务成功
+  // 没有成功Promise.reject抛出错误
+  const { message, data, success } = response.data
+  if (success) { // 业务逻辑是成功的
+    return data
+  }
+  // 业务逻辑没有成功
+  Message.error(message)
+  return Promise.reject(new Error(message))
+}, error => {
+  // console.log(error.response)
+  if (error.response && error.response.status === 401) {
+    store.dispatch('user/logoutAction') // 个人信息和token清空
+    router.push('/login')
+    Message.error('token 超时，请重新登录')
+  } else {
+    Message.error(error.message)
+  }
+  return Promise.reject(error)
+})
+
 export default service

@@ -15,10 +15,7 @@ export default {
       'name'
     ])
   }
-  // async created() {
-  //   await this.$store.dispatch('user/getUserInfo')
-  //   // res.username = '11111'
-  // }
+
 }
 </script>
 

@@ -1,5 +1,4 @@
-// 引入axios
-import request from '@/utils/request'
+import request from '@/utils/request.js'
 export function loginAPI(data) {
   return request({
     url: '/sys/login',
