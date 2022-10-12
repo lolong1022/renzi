@@ -1,6 +1,8 @@
 <template>
   <div>
     approvals
+    <UploadExcel :on-success="onSuccess" />
+
   </div>
 </template>
 
@@ -19,7 +21,9 @@ export default {
   },
 
   methods: {
-
+    onSuccess(data) {
+      console.log(data)
+    }
   }
 }
 </script>
