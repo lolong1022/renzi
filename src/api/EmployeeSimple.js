@@ -52,3 +52,46 @@ export function importEmployee(data) {
     data
   })
 }
+
+/** *
+ *  读取用户详情的基础信息
+ * **/
+export function getPersonalDetailAPI(id) {
+  return request({
+    url: `/employees/${id}/personalInfo`
+  })
+}
+
+/** *
+ *  更新用户详情的基础信息
+ * **/
+export function updatePersonal(data) {
+  return request({
+    url: `/employees/${data.userId}/personalInfo`,
+    method: 'put',
+    data
+  })
+}
+
+/** *
+ * 获取用户的岗位信息 -
+ *return promise
+ *(id) -- 员工的id
+ *  **/
+export function getJobDetail(id) {
+  return request({
+    url: `/employees/${id}/jobs`
+  })
+}
+/** *
+ * 保存用户的岗位信息 -
+ *return promise
+ *(id) -- 员工的id
+ *  **/
+export function saveJobDetail(data) {
+  return request({
+    url: `/employees/${data.userId}/jobs`,
+    method: 'PUT',
+    data
+  })
+}
