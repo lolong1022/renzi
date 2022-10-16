@@ -1,6 +1,8 @@
 <template>
   <div class="user-info">
     <!-- 个人信息 -->
+    <i class="el-icon-printer" @click="$router.push('/employees/print/'+userId + '?type=personal')" />
+
     <el-form label-width="220px">
       <!-- 工号 入职时间 -->
       <el-row class="inline-info">
@@ -58,13 +60,14 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <UploadImg ref="uploadAvatar" :default-url="employeesAvatar" @on-success="uploadAvatarSuccess" />
           </el-form-item>
         </el-col>
       </el-row>
       <!-- 保存个人信息 -->
       <el-row class="inline-info" type="flex" justify="center">
         <el-col :span="12">
-          <el-button type="primary" @click="saveUserInfo">保存更新</el-button>
+          <el-button type="primary" @click="saveUserBasicInfo">保存更新</el-button>
           <el-button @click="$router.back()">返回</el-button>
         </el-col>
       </el-row>
@@ -91,6 +94,7 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <UploadImg ref="uploadImg" :default-url="employeesImg" @on-success="uploadImgSuccess" />
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -376,7 +380,7 @@
         <!-- 保存员工信息 -->
         <el-row class="inline-info" type="flex" justify="center">
           <el-col :span="12">
-            <el-button type="primary" @click="saveEmploayeesInfo">保存更新</el-button>
+            <el-button type="primary" @click="saveEmployeeInfo">保存更新</el-button>
             <el-button @click="$router.back()">返回</el-button>
           </el-col>
         </el-row>
@@ -387,11 +391,15 @@
 
 <script>
 import EmployeeEnum from '@/api/constant/employees'
-import { getUserBasicInfoAPI, saveUserDetailById } from '@/api/user'
-import { getPersonalDetailAPI, updatePersonal } from '@/api/EmployeeSimple'
+import {
+  getUserBasicInfoAPI, getPersonalDetailAPI, saveUserDetailById,
+  updatePersonal
+} from '@/api'
 export default {
   data() {
     return {
+      employeesAvatar: '',
+      employeesImg: '',
       userId: this.$route.params.id,
       EmployeeEnum, // 员工枚举数据
       userInfo: {},
@@ -462,37 +470,57 @@ export default {
   },
   created() {
     this.getUserBasicInfo()
-    this.getPersonalDetail()
+    this.getEmployeeInfo()
   },
   methods: {
-    // 保存用户基本信息
-
-    async saveUserInfo() {
-      try {
-        await saveUserDetailById(this.userInfo)
-        this.$message.success('更改用户信息成功')
-      } catch (error) {
-        this.$message.errror('更改用信息是失败')
+  // 员工基本信息
+    async getUserBasicInfo() {
+      const res = await getUserBasicInfoAPI(this.userId)
+      this.userInfo = res
+      if (res.staffPhoto) {
+        this.employeesAvatar = res.staffPhoto
       }
     },
-    // 点击更新员 工基本信息
-    async  saveEmploayeesInfo() {
+    async getEmployeeInfo() {
+      const res = await getPersonalDetailAPI(this.userId)
+      console.log(777, res)
+      this.formData = res
+      if (res.staffPhoto) {
+        this.employeesImg = res.staffPhoto
+      }
+    },
+    async saveEmployeeInfo() {
       try {
+        if (this.$refs.uploadImg.loading) {
+          return this.$message.error('正在上传，莫急')
+        }
+        console.log(777, getPersonalDetailAPI)
         await updatePersonal(this.formData)
         this.$message.success('更新成功')
       } catch (error) {
         this.$message.error('更新失败')
       }
     },
-    // 上半边数据
-    async getUserBasicInfo() {
-      const res = await getUserBasicInfoAPI(this.userId)
-      this.userInfo = res
+    async saveUserBasicInfo() {
+      try {
+        if (this.$refs.uploadAvatar.loading) {
+          return this.$message.error('正在上传，莫急')
+        }
+        await saveUserDetailById(this.userInfo)
+        this.$message.success('更新成功')
+      } catch (error) {
+        this.$message.error('更新失败')
+      }
     },
-    async getPersonalDetail() {
-      const res = await getPersonalDetailAPI(this.userId)
-      // console.log(11, res)
-      this.formData = res
+    // 本地头像成功回调
+
+    uploadAvatarSuccess(data) {
+      this.userInfo.staffPhoto = data.imgUrl
+    },
+    // 本地图片成功回调
+    uploadImgSuccess(data) {
+      console.log(6, data)
+      this.formData.staffPhoto = data.imgUrl
     }
   }
 }

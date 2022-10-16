@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
-    <svg-icon icon-class="eye-open" />
+    <UploadImg @onSuccess="success1" />
+
   </div>
 </template>
 
@@ -14,6 +14,10 @@ export default {
     ...mapGetters([
       'name'
     ])
+  },
+  methods: {
+    success1() {
+    }
   }
 
 }

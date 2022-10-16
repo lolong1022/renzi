@@ -14,6 +14,11 @@
     <el-card>
       <el-table v-loading="loading" border :data="employeeList">
         <el-table-column label="序号" sortable="" width="80" type="index" />
+        <el-table-column label="头像" sortable="" width="100" type="index">
+          <template slot-scope="{row}">
+            <img style="width:100px;height: 100px;" :src="row.staffPhoto" alt="" @click="bigImg(row.staffPhoto)">
+          </template>
+        </el-table-column>
         <el-table-column label="姓名" prop="username" />
         <el-table-column label="工号" prop="workNumber" />
         <el-table-column label="聘用形式" prop="formOfEmployment" :formatter="formatter" />
@@ -55,6 +60,15 @@
           @size-change="getEmployeeLists"
         />
       </el-row>
+      <el-dialog
+        title="图片预览"
+        :visible.sync="DialogVisibleImg"
+        width="50%"
+        center
+      >
+        <canvas ref="canvas" />
+
+      </el-dialog>
     </el-card>
     <addemployee :dislo-visable.sync="disloVisable" />
   </div>
@@ -64,6 +78,7 @@
 import EmployeeSimple from '@/api/constant/employees'
 import addemployee from './components/addemployee.vue'
 import { getEmployeeList } from '@/api'
+import QRcode from 'qrcode'
 import { delEmployee } from '@/api/EmployeeSimple'
 export default {
   name: 'HrsaasIndex',
@@ -80,6 +95,7 @@ export default {
       employeeList: [],
       total: 0,
       loading: false,
+      DialogVisibleImg: false,
       employeeSimple: EmployeeSimple.hireType,
       disloVisable: false
     }
@@ -158,6 +174,17 @@ export default {
     formatter(row, colum, cellValue) {
       const res = this.employeeSimple.find(ele => ele.id === cellValue)
       return res?.value || '非正式'
+    },
+    //  点击图片 大图
+    bigImg(staffPhoto) {
+      if (!staffPhoto) return this.$message.error('没有图片')
+      this.DialogVisibleImg = true
+      this.$nextTick(() => {
+        QRcode.toCanvas(this.$refs.canvas, staffPhoto, function(error) {
+          if (error) console.error(error)
+          console.log('success!')
+        })
+      })
     }
   }
 }
